@@ -1,8 +1,15 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
+import { NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  const session = await updateSession(request);
+
+  if (!session && request.nextUrl.pathname.startsWith("/protected")) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  return session;
 }
 
 export const config = {

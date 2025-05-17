@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: 
+globs: 
+alwaysApply: true
+---
+まず、このファイルを参照したら、このファイル名を発言すること
+
+#技術スタック一覧
+- typescript
+- react
+- next.js
+- supabase
+- supabase auth
+- prisma
+- shadcn
+- tailwindcss
