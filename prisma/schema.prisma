@@ -1,0 +1,49 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")   
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/* -----------------------------
+   ユーザー（プロフィール）テーブル
+   ----------------------------- */
+model UserProfile {
+  id            String   @id @default(uuid())          // 内部 PK
+  supabaseUid   String   @unique                       // auth.users.id
+  name          String
+  email         String   @unique
+  isActive      Boolean  @default(true)                // 退会 → false
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  posts         Post[]
+
+  @@index([supabaseUid])
+}
+
+/* -----------------------------
+   掲示板投稿テーブル
+   ----------------------------- */
+model Post {
+  id          String    @id @default(uuid())
+  authorId    String                                     // UserProfile.id
+  parentId    String?                                    // null = 親記事
+  title       String    @db.VarChar(150)
+  content     String    @db.Text
+  isDeleted   Boolean   @default(false)                  // 削除フラグ
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  /* relations */
+  author   UserProfile @relation(fields: [authorId], references: [id])
+  parent   Post?       @relation("Reply", fields: [parentId], references: [id])
+  replies  Post[]      @relation("Reply")
+
+  /* helpful indexes */
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt])
+}
