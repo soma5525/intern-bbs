@@ -9,7 +9,7 @@ export async function Header() {
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/posts" className="text-xl font-bold">
-          Bulletin Board
+          掲示板
         </Link>
         <div className="flex items-center gap-4">
           <AuthButton />

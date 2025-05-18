@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
@@ -21,29 +21,29 @@ export function Pagination({
         {hasPrevPage ? (
           <Link href={`/posts?page=${currentPage - 1}`}>
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
+            前へ
           </Link>
         ) : (
           <span>
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
+            前へ
           </span>
         )}
       </Button>
 
       <span className="text-sm text-muted-foreground">
-        Page {currentPage} of {totalPages}
+        {currentPage} / {totalPages}
       </span>
 
       <Button variant="outline" size="sm" disabled={!hasNextPage} asChild>
         {hasNextPage ? (
           <Link href={`/posts?page=${currentPage + 1}`}>
-            Next
+            次へ
             <ChevronRight className="h-4 w-4 ml-1" />
           </Link>
         ) : (
           <span>
-            Next
+            次へ
             <ChevronRight className="h-4 w-4 ml-1" />
           </span>
         )}

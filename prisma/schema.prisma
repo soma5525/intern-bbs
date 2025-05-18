@@ -21,7 +21,7 @@ model UserProfile {
 
   posts         Post[]
 
-  @@index([supabaseUid])
+  @@index([supabaseUid]) // supabaseUidでユーザーを検索できるようにする
 }
 
 /* -----------------------------
