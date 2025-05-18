@@ -22,8 +22,7 @@ export default async function PostsPage({
   const user = await getCurrentUser();
   if (!user) redirect("/");
 
-  const pageParam = await searchParams.page;
-  const page = pageParam ? Number.parseInt(pageParam.toString()) : 1;
+  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
   const { posts, pagination } = await getPosts(page);
 
   return (

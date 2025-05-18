@@ -1,6 +1,34 @@
 "use server";
 
+import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+export async function createPost(formData: FormData) {
+  const user = await getCurrentUser();
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+
+  if (!title || title.length > 150) {
+    return { error: "タイトルは必須で、150文字以内である必要があります。" };
+  }
+
+  if (!content) {
+    return { error: "内容は必須です" };
+  }
+
+  await prisma.post.create({
+    data: {
+      title,
+      content,
+      authorId: user?.id as string,
+    },
+  });
+
+  revalidatePath("/protected/posts");
+  redirect("/protected/posts");
+}
 
 export async function getPosts(page = 1) {
   const postsPerPage = 10;
