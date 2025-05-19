@@ -145,3 +145,32 @@ export async function getPost(id: string) {
     isOwner,
   };
 }
+
+export async function deletePost(id: string) {
+  const user = await getCurrentUser();
+
+  const post = await prisma.post.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  if (!post) {
+    return { error: "投稿が見つかりません。" };
+  }
+
+  if (post.authorId !== user?.id) {
+    return { error: "この投稿を削除する権限がありません。" };
+  }
+
+  await prisma.post.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+    },
+  });
+
+  revalidatePath("/protected/posts");
+  redirect("/protected/posts");
+}

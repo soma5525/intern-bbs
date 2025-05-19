@@ -33,10 +33,14 @@ export function PostCard({ post, isOwner }: PostCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          {post.author.name}
+        </div>
         <CardTitle className="text-xl">{post.title}</CardTitle>
         <CardDescription>
-          Posted by {post.author.name}{" "}
-          {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+          {formatDistanceToNow(new Date(post.createdAt), {
+            addSuffix: true,
+          })}
         </CardDescription>
       </CardHeader>
 
