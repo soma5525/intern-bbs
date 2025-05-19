@@ -46,9 +46,9 @@ export function PostCard({ post, isOwner }: PostCardProps) {
       {isOwner && (
         <CardFooter className="flex justify-end space-x-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/posts/${post.id}/edit`}>編集</Link>
+            <Link href={`/protected/posts/${post.id}/edit`}>編集</Link>
           </Button>
-          <form action={`/posts/${post.id}/delete`} method="post">
+          <form action={`/protected/posts/${post.id}/delete`} method="post">
             <input type="hidden" name="id" value={post.id} />
             <Button variant="destructive" size="sm" type="submit">
               削除

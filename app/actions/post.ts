@@ -30,6 +30,49 @@ export async function createPost(formData: FormData) {
   redirect("/protected/posts");
 }
 
+export async function updatePost(formData: FormData) {
+  const user = await getCurrentUser();
+  const id = formData.get("id") as string;
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+
+  if (!title || title.length > 150) {
+    return { error: "タイトルは必須で、150文字以内である必要があります。" };
+  }
+
+  if (!content) {
+    return {
+      error: "内容は必須です。",
+    };
+  }
+
+  const post = await prisma.post.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  if (!post) {
+    return { error: "投稿が見つかりません。" };
+  }
+
+  if (post.authorId !== user?.id) {
+    return { error: "この投稿を編集する権限がありません。" };
+  }
+
+  await prisma.post.update({
+    where: { id },
+    data: {
+      title,
+      content,
+    },
+  });
+
+  revalidatePath("/protected/posts");
+  redirect("/protected/posts");
+}
+
 export async function getPosts(page = 1) {
   const postsPerPage = 10;
   const skip = (page - 1) * postsPerPage;
@@ -70,5 +113,35 @@ export async function getPosts(page = 1) {
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
+  };
+}
+
+export async function getPost(id: string) {
+  const user = await getCurrentUser();
+
+  const post = await prisma.post.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  if (!post) {
+    return { error: "投稿が見つかりません" };
+  }
+
+  const isOwner = post.authorId === user?.id;
+
+  return {
+    post,
+    isOwner,
   };
 }
