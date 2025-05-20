@@ -8,7 +8,7 @@ export async function Header() {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/posts" className="text-xl font-bold">
+        <Link href="/protected/posts" className="text-xl font-bold">
           掲示板
         </Link>
         <div className="flex items-center gap-4">

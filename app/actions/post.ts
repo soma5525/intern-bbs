@@ -80,6 +80,9 @@ export async function getPosts(page = 1) {
   const posts = await prisma.post.findMany({
     where: {
       isDeleted: false,
+      author: {
+        isActive: true,
+      },
     },
     include: {
       author: {
@@ -98,6 +101,9 @@ export async function getPosts(page = 1) {
   const totalPosts = await prisma.post.count({
     where: {
       isDeleted: false,
+      author: {
+        isActive: true,
+      },
     },
   });
 

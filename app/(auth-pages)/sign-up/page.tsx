@@ -1,10 +1,15 @@
-import { signUpAction } from "@/app/actions/auth";
+import { saveSignUp } from "@/app/actions/auth";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { SmtpMessage } from "../smtp-message";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "新規登録",
+  description: "新規登録ページです。",
+};
 
 export default async function Signup(props: {
   searchParams: Promise<Message>;
@@ -50,13 +55,12 @@ export default async function Signup(props: {
               minLength={6}
               required
             />
-            <SubmitButton formAction={signUpAction} pendingText="Signing up...">
-              登録する
+            <SubmitButton formAction={saveSignUp} pendingText="確認画面へ...">
+              確認画面へ
             </SubmitButton>
             <FormMessage message={searchParams} />
           </div>
         </form>
-        <SmtpMessage />
       </div>
     </div>
   );

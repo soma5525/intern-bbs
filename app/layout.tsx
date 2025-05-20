@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bulletin Board",
-  description: "A simple bulletin board system built with Next.js",
+  title: "掲示板",
+  description: "掲示板です",
 };
 
 export default function RootLayout({

@@ -10,8 +10,8 @@ import { PostCard } from "@/components/post-card";
 import { Pagination } from "@/components/pagination";
 
 export const metadata: Metadata = {
-  title: "Posts - Bulletin Board",
-  description: "View all posts",
+  title: "投稿一覧 - 掲示板",
+  description: "投稿一覧を表示します",
 };
 
 export default async function PostsPage({

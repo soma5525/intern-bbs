@@ -19,7 +19,7 @@ export function Pagination({
     <div className="flex justify-center items-center gap-2 mt-6">
       <Button variant="outline" size="sm" disabled={!hasPrevPage} asChild>
         {hasPrevPage ? (
-          <Link href={`/posts?page=${currentPage - 1}`}>
+          <Link href={`/protected/posts?page=${currentPage - 1}`}>
             <ChevronLeft className="h-4 w-4 mr-1" />
             前へ
           </Link>
@@ -37,7 +37,7 @@ export function Pagination({
 
       <Button variant="outline" size="sm" disabled={!hasNextPage} asChild>
         {hasNextPage ? (
-          <Link href={`/posts?page=${currentPage + 1}`}>
+          <Link href={`/protected/posts?page=${currentPage + 1}`}>
             次へ
             <ChevronRight className="h-4 w-4 ml-1" />
           </Link>

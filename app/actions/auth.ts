@@ -5,22 +5,55 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
-export const signUpAction = async (formData: FormData) => {
+export const saveSignUp = async (formData: FormData): Promise<void> => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const name = formData.get("name")?.toString();
 
+  if (!email || !password || !name) {
+    throw new Error("メールアドレス、パスワード、名前は必須項目です");
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set("signUpData", JSON.stringify({ email, password, name }), {
+    maxAge: 60 * 10,
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  redirect("/sign-up/confirm");
+};
+
+export const getSignUpData = async () => {
+  const signUpDataCookie = (await cookies()).get("signUpData");
+  if (!signUpDataCookie) {
+    redirect("/sign-up");
+  }
+
+  try {
+    return JSON.parse(signUpDataCookie.value);
+  } catch (error) {
+    (await cookies()).delete("signUpData");
+    redirect("/sign-up");
+  }
+};
+
+export const signUpAction = async (formData: FormData) => {
+  const { email, password, name } = await getSignUpData();
+
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
-  if (!email || !password) {
+  if (!email || !password || !name) {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "ユーザー名、メールアドレス、パスワードは必須項目です"
+      "user name, email, password are required" // 英語で入力
     );
   }
 
@@ -28,6 +61,9 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
+      data: {
+        full_name: name,
+      },
       emailRedirectTo: `${origin}/auth/callback`,
     },
   });
@@ -37,7 +73,6 @@ export const signUpAction = async (formData: FormData) => {
   }
 
   if (authData.user) {
-    console.log(authData);
     try {
       await prisma.userProfile.create({
         data: {
@@ -52,15 +87,15 @@ export const signUpAction = async (formData: FormData) => {
       return encodedRedirect(
         "error",
         "/sign-up",
-        "プロフィール作成に失敗しました"
+        "profile creation failed" // 英語で入力
       );
     }
   }
 
   return encodedRedirect(
     "success",
-    "/sign-up",
-    "Thanks for signing up! Please check your email for a verification link."
+    "/sign-in",
+    "Thanks for signing up! Please log in." // 英語で入力
   );
 };
 
@@ -111,7 +146,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/forgot-password",
-    "Check your email for a link to reset your password."
+    "送信したメールを確認してください"
   );
 };
 
@@ -125,7 +160,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password and confirm password are required"
+      "パスワードと確認用パスワードは必須項目です"
     );
   }
 
@@ -133,7 +168,7 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Passwords do not match"
+      "パスワードと確認用パスワードが一致しません"
     );
   }
 
@@ -145,11 +180,11 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/protected/reset-password",
-      "Password update failed"
+      "パスワードの更新に失敗しました"
     );
   }
 
-  encodedRedirect("success", "/protected/reset-password", "Password updated");
+  encodedRedirect("success", "/sign-in", "パスワードを更新しました");
 };
 
 export const signOutAction = async () => {
