@@ -13,7 +13,7 @@ export default async function ConfirmPage() {
   }
 
   if (!profileData.name || !profileData.email) {
-    redirect("/profile/edit");
+    redirect("/protected/profile/edit");
   }
 
   return (
@@ -28,7 +28,7 @@ export default async function ConfirmPage() {
             { label: "メールアドレス", value: profileData.email },
           ]}
           onConfirm={updateUserProfile}
-          cancelHref="/profile/edit"
+          cancelHref="/protected/profile/edit"
         />
       </main>
     </div>

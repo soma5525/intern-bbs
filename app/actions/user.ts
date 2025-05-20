@@ -63,16 +63,15 @@ export async function updateUserProfile(formData: FormData) {
       where: { id: user.id },
       data: { name: profileData.name, email: profileData.email },
     });
+    // return { success: true };
   } catch (dbErr) {
     // rollback（成功可否は無視してユーザーへはエラー返却）
     await supabase.auth.updateUser({ email: user.email });
     return { error: "データベース更新に失敗しました" };
   }
 
-  (await cookies()).delete("profileData");
-
   revalidatePath("/protected/profile/edit");
-  redirect("/protected/posts");
+  return { success: true };
 }
 
 export async function deactivateAccount() {

@@ -10,14 +10,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ConfirmationPageProps {
   title: string;
   description: string;
   items: { label: string; value: string }[];
-  onConfirm: (formData: FormData) => Promise<{ error?: string }>;
+  onConfirm: (
+    formData: FormData
+  ) => Promise<{ error?: string } | { success: true } | undefined>;
   cancelHref: string;
   isLoading?: boolean;
+  successRedirectPath?: string;
 }
 
 export function ConfirmationPage({
@@ -27,7 +33,40 @@ export function ConfirmationPage({
   onConfirm,
   cancelHref,
   isLoading = false,
+  successRedirectPath = "/protected/posts",
 }: ConfirmationPageProps) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const handleConfirm = async () => {
+    setProcessing(true);
+    setError(null);
+
+    try {
+      const result = await onConfirm(new FormData());
+      if (result && "error" in result && result.error) {
+        setError(result.error);
+      } else if (result && "success" in result) {
+        router.push(successRedirectPath);
+      }
+    } catch (err) {
+      if (err && typeof err === "object" && "digest" in err) {
+        const digestStr = String(err.digest || "");
+        if (digestStr.includes("NEXT_REDIRECT")) {
+          console.log(
+            "リダイレクトが発生します。このエラーは無視してください。"
+          );
+          return;
+        }
+      }
+      console.error("handleConfirm catch error:", JSON.stringify(err, null, 2));
+      setError("予期しないエラーが発生しました");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -44,14 +83,19 @@ export function ConfirmationPage({
               <div className="col-span-2">{item.value}</div>
             </div>
           ))}
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" asChild>
           <Link href={cancelHref}>戻る</Link>
         </Button>
-        <Button onClick={() => onConfirm(new FormData())} disabled={isLoading}>
-          {isLoading ? "処理中..." : "確認して保存"}
+        <Button onClick={handleConfirm} disabled={isLoading || processing}>
+          {isLoading || processing ? "処理中..." : "確認して保存"}
         </Button>
       </CardFooter>
     </Card>

@@ -18,16 +18,21 @@ export async function createPost(formData: FormData) {
     return { error: "内容は必須です" };
   }
 
-  await prisma.post.create({
-    data: {
-      title,
-      content,
-      authorId: user?.id as string,
-    },
-  });
-
-  revalidatePath("/protected/posts");
-  redirect("/protected/posts");
+  try {
+    await prisma.post.create({
+      data: {
+        title,
+        content,
+        authorId: user?.id as string,
+      },
+    });
+    revalidatePath("/protected/posts");
+    // redirect("/protected/posts"); // リダイレクトはクライアントサイドで行う必要がある
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "投稿に失敗しました" };
+  }
 }
 
 export async function updatePost(formData: FormData) {
@@ -70,7 +75,8 @@ export async function updatePost(formData: FormData) {
   });
 
   revalidatePath("/protected/posts");
-  redirect("/protected/posts");
+  // redirect("/protected/posts"); // ここも上記のcreatePostと同様
+  return { success: true };
 }
 
 export async function getPosts(page = 1) {

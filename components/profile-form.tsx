@@ -23,9 +23,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ProfileFormProps {
-  updateAction: (formData: FormData) => Promise<{ error?: string } | undefined>;
+  updateAction: (
+    formData: FormData
+  ) => Promise<{ error?: string } | { success: true } | undefined>;
   deactivateAction: () => Promise<{ error?: string } | undefined>;
   initialData: {
     name: string;
@@ -41,6 +44,7 @@ export function ProfileForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -48,11 +52,28 @@ export function ProfileForm({
 
     try {
       const result = await updateAction(formData);
-      if (result?.error) {
+      if (result && "error" in result && result.error) {
         setError(result.error);
+        return;
+      } else if (result && "success" in result) {
+        router.push("/protected/posts");
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      // リダイレクトエラーをチェック
+      if (err && typeof err === "object" && "digest" in err) {
+        const digestStr = String(err.digest || "");
+        if (digestStr.includes("NEXT_REDIRECT")) {
+          // リダイレクトエラーは正常なフローなので、エラーとして扱わない
+          // リダイレクトはサーバーサイドで処理されるため、ここで何もする必要なし
+          console.log(
+            "リダイレクトが発生します。このエラーは無視してください。"
+          );
+          return;
+        }
+      }
+      // それ以外の予期しないエラー
+      console.error("handleSubmit catch error:", JSON.stringify(err, null, 2));
+      setError("予期しないエラーが発生しました");
     } finally {
       setIsLoading(false);
     }

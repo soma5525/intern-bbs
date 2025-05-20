@@ -14,10 +14,13 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useRouter } from "next/navigation";
 
 interface PostFormProps {
   type: "create" | "edit";
-  action: (formData: FormData) => Promise<{ error?: string } | undefined>;
+  action: (
+    formData: FormData
+  ) => Promise<{ error?: string } | { success: true } | undefined>;
   initialData?: {
     id: string;
     title: string;
@@ -28,6 +31,7 @@ interface PostFormProps {
 export function PostForm({ type, action, initialData }: PostFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -35,8 +39,11 @@ export function PostForm({ type, action, initialData }: PostFormProps) {
 
     try {
       const result = await action(formData);
-      if (result?.error) {
+      if (result && "error" in result && result.error) {
         setError(result.error);
+        return;
+      } else if (result && "success" in result) {
+        router.push("/protected/posts");
       }
     } catch (err) {
       setError("予期しないエラーが発生しました");
