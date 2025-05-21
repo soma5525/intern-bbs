@@ -13,9 +13,10 @@ export const metadata: Metadata = {
 export default async function EditPostPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { post, isOwner } = await getPost(params.id);
+  const { id } = await params;
+  const { post, isOwner } = await getPost(id);
 
   if (!isOwner) {
     redirect("/posts");

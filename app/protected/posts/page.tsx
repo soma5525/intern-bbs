@@ -17,12 +17,13 @@ export const metadata: Metadata = {
 export default async function PostsPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/");
 
-  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;
+  const { page: pageParam } = await searchParams;
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
   const { posts, pagination } = await getPosts(page);
 
   return (
