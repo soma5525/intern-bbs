@@ -18,21 +18,19 @@ export default async function SignUpConfirmPage() {
 
   const maskedPassword = "•".repeat(signUpData.password.length);
 
-  if (!signUpData.name || !signUpData.email) {
+  if (!signUpData.name || !signUpData.email || !signUpData.password) {
     redirect("/sign-up");
   }
 
   async function handleConfirm() {
     "use server";
 
-    const signUpData = await getSignUpData();
-
     const formData = new FormData();
     formData.append("email", signUpData.email);
     formData.append("password", signUpData.password);
     formData.append("name", signUpData.name);
 
-    await signUpAction(formData); // singUpActionは成功したらsign-inにリダイレクトする
+    await signUpAction(formData);
     (await cookies()).delete("signUpData");
 
     return { error: "サインアップに失敗しました" };

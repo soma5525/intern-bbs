@@ -56,6 +56,8 @@ export function ProfileForm({
         return;
       } else if (result && "success" in result) {
         router.push("/protected/posts");
+      } else {
+        setError("プロフィールの更新に失敗しました。");
       }
     } catch (err) {
       // リダイレクトエラーをチェック
@@ -80,10 +82,17 @@ export function ProfileForm({
 
   async function handleDeactivate() {
     setIsLoading(true);
+    setError(null);
     try {
-      await deactivateAction();
+      const result = await deactivateAction();
+      if (result && result.error) {
+        setError(result.error);
+      } else {
+        router.push("/sign-in");
+      }
     } catch (err) {
-      setError("Failed to deactivate account");
+      setError("アカウントの削除に失敗しました");
+    } finally {
       setIsLoading(false);
     }
   }

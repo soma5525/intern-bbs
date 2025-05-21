@@ -34,7 +34,7 @@ export function PostCard({ post, isOwner }: PostCardProps) {
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center gap-2 text-muted-foreground">
-          {post.author.name}
+          {post.author?.name || "匿名ユーザー"}
         </div>
         <CardTitle className="text-xl">{post.title}</CardTitle>
         <CardDescription>

@@ -33,7 +33,7 @@ export default async function ProfileEditPage() {
           updateAction={saveProfileData}
           deactivateAction={deactivateAccount}
           initialData={{
-            name: user.user_metadata.full_name,
+            name: user.user_metadata?.full_name ?? "",
             email: email,
           }}
         />

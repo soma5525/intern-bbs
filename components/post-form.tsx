@@ -44,6 +44,8 @@ export function PostForm({ type, action, initialData }: PostFormProps) {
         return;
       } else if (result && "success" in result) {
         router.push("/protected/posts");
+      } else {
+        setError("投稿処理に失敗しました。");
       }
     } catch (err) {
       setError("予期しないエラーが発生しました");

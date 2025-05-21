@@ -49,6 +49,8 @@ export function ConfirmationPage({
         setError(result.error);
       } else if (result && "success" in result) {
         router.push(successRedirectPath);
+      } else {
+        setError("処理に失敗しました。");
       }
     } catch (err) {
       if (err && typeof err === "object" && "digest" in err) {

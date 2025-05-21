@@ -46,7 +46,7 @@ export default async function AuthButton() {
   }
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.name}!
+      Hey, {user.name || user.email || "ゲスト"}さん!
       <Button variant="ghost" size="sm" asChild>
         <Link href="/protected/profile/edit">プロフィール編集</Link>
       </Button>
