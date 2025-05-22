@@ -176,13 +176,21 @@ export async function deletePost(id: string) {
     return { error: "この投稿を削除する権限がありません。" };
   }
 
-  await prisma.post.update({
-    where: { id },
-    data: {
-      isDeleted: true,
-    },
-  });
+  try {
+    await prisma.post.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+      },
+    });
 
-  revalidatePath("/protected/posts");
-  redirect("/protected/posts");
+    revalidatePath("/protected/posts");
+    // redirect は成功した場合のみ行われるべきなので、ここでは return するか、
+    // ルートハンドラ側でリダイレクトをハンドリングする。
+    // 今回は成功を示すために { success: true } を返すように変更し、リダイレクトはルートハンドラで行う。
+    return { success: true };
+  } catch (dbError) {
+    console.error("データベース削除エラー:", dbError); // 詳細なエラーログ
+    return { error: "投稿の削除中にデータベースエラーが発生しました。" };
+  }
 }
