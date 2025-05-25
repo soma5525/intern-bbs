@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -24,6 +27,18 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, isOwner }: PostCardProps) {
+  const [timeAgo, setTimeAgo] = useState<string>("");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    setTimeAgo(
+      formatDistanceToNow(new Date(post.createdAt), {
+        addSuffix: true,
+      })
+    );
+  }, [post.createdAt]);
+
   const contentPreview =
     post.content.length > 150
       ? // 投稿の内容が長い場合、最初の150文字のみを表示し、末尾に「...」を追加
@@ -38,9 +53,7 @@ export function PostCard({ post, isOwner }: PostCardProps) {
         </div>
         <CardTitle className="text-xl">{post.title}</CardTitle>
         <CardDescription>
-          {formatDistanceToNow(new Date(post.createdAt), {
-            addSuffix: true,
-          })}
+          {isClient ? timeAgo : new Date(post.createdAt).toLocaleDateString()}
         </CardDescription>
       </CardHeader>
 

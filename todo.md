@@ -117,3 +117,11 @@
   - [x] ミドルウェアのセッション管理の見直し
   - [x] Supabase セッション更新の確認
   - 見積時間: 2時間
+
+### 🔴 Hydration関連
+
+- [x] Hydration Mismatchエラーの修正
+  - [x] date-fnsのformatDistanceToNowによるSSR/CSRの不整合を修正
+  - [x] カスタムフック（useTimeAgo）の実装
+  - [x] クライアントサイドでのみ時刻フォーマットを実行するように変更
+  - 見積時間: 1時間
