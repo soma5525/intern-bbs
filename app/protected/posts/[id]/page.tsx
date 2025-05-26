@@ -10,9 +10,10 @@ import { ReplyForm } from "@/components/reply-form";
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const result = await getPostWithReplies(params.id);
+  const { id } = await params;
+  const result = await getPostWithReplies(id);
 
   if (!result) {
     return {
@@ -35,14 +36,15 @@ export async function generateMetadata({
 export default async function PostDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
     redirect("/login");
   }
 
-  const result = await getPostWithReplies(params.id);
+  const { id } = await params;
+  const result = await getPostWithReplies(id);
 
   if (!result) {
     notFound();
