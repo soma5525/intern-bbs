@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+
 export async function saveProfileData(formData: FormData) {
   const user = await getCurrentUser();
 
