@@ -1,4 +1,3 @@
-import { Header } from "@/components/header";
 import { getCurrentUser } from "@/lib/auth";
 import { getSignUpData } from "@/app/actions/auth";
 import { redirect } from "next/navigation";

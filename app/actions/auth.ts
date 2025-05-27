@@ -4,10 +4,8 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
 import { cookies } from "next/headers";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export const saveSignUp = async (formData: FormData): Promise<void> => {
   const email = formData.get("email")?.toString();

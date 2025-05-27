@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { PostForm } from "@/components/post-form";
 import { ReplyForm } from "@/components/reply-form";
 import { updatePost } from "@/app/actions/post";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {

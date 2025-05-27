@@ -2,8 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function createReply(parentId: string, formData: FormData) {
   const user = await getCurrentUser();
