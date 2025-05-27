@@ -77,3 +77,46 @@ export async function getPostWithReplies(id: string) {
 
   return { post, replies };
 }
+
+export async function updateReply(formData: FormData) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { error: "ユーザーが見つかりません" };
+  }
+
+  const id = formData.get("id") as string;
+  const content = formData.get("content") as string;
+
+  if (!content) {
+    return { error: "返信内容は必須です" };
+  }
+
+  const reply = await prisma.post.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  if (!reply) {
+    return { error: "返信が見つかりません" };
+  }
+
+  if (reply.authorId !== user.id) {
+    return { error: "この返信を編集する権限がありません" };
+  }
+
+  if (!reply.parentId) {
+    return { error: "この投稿は返信ではありません" };
+  }
+
+  await prisma.post.update({
+    where: { id },
+    data: {
+      content,
+    },
+  });
+
+  revalidatePath(`/protected/posts/${reply.parentId}`);
+  return { success: true };
+}

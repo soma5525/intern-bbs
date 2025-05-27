@@ -12,19 +12,30 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface ReplyFormProps {
   parentId: string;
   action: (
     parentId: string,
     formData: FormData
-  ) => Promise<{ error?: string } | undefined>;
+  ) => Promise<{ error?: string } | { success?: boolean } | undefined>;
+  type?: "create" | "edit";
+  initialData?: {
+    id: string;
+    content: string;
+  };
 }
 
-export function ReplyForm({ parentId, action }: ReplyFormProps) {
+export function ReplyForm({
+  parentId,
+  action,
+  type = "create",
+  initialData,
+}: ReplyFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(initialData?.content || "");
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
@@ -32,14 +43,20 @@ export function ReplyForm({ parentId, action }: ReplyFormProps) {
 
     try {
       const result = await action(parentId, formData);
-      if (result?.error) {
+      if (result && "error" in result && result.error) {
         setError(result.error);
-        setIsLoading(false);
-      } else {
+      } else if (type === "create") {
         setContent("");
+        // 成功時にページをリロードして最新の返信を表示
+        window.location.reload();
+      } else if (type === "edit" && result && "success" in result) {
+        // 編集の場合は親投稿のページにリダイレクト
+        window.location.href = `/protected/posts/${parentId}`;
       }
     } catch (err) {
       setError("予期せぬエラーが発生しました");
+    } finally {
+      // 必ずisLoadingをfalseにリセット
       setIsLoading(false);
     }
   }
@@ -47,11 +64,18 @@ export function ReplyForm({ parentId, action }: ReplyFormProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>返信を投稿</CardTitle>
-        <CardDescription>この投稿に返信してください</CardDescription>
+        <CardTitle>{type === "create" ? "返信を投稿" : "返信を編集"}</CardTitle>
+        <CardDescription>
+          {type === "create"
+            ? "この投稿に返信してください"
+            : "返信内容を編集してください"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form action={handleSubmit} className="space-y-4">
+          {initialData?.id && (
+            <input type="hidden" name="id" value={initialData.id} />
+          )}
           <div className="space-y-2">
             <Label htmlFor="content">返信内容</Label>
             <Textarea
@@ -70,11 +94,16 @@ export function ReplyForm({ parentId, action }: ReplyFormProps) {
             </Alert>
           )}
           <div className="flex justify-end space-x-2">
+            {type === "edit" && (
+              <Button variant="outline" asChild>
+                <Link href={`/protected/posts/${parentId}`}>キャンセル</Link>
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
               onClick={() => {
-                setContent("");
+                setContent(initialData?.content || "");
                 setError(null);
               }}
               disabled={isLoading}
@@ -82,7 +111,13 @@ export function ReplyForm({ parentId, action }: ReplyFormProps) {
               クリア
             </Button>
             <Button type="submit" disabled={isLoading || !content.trim()}>
-              {isLoading ? "投稿中..." : "返信する"}
+              {isLoading
+                ? type === "create"
+                  ? "投稿中..."
+                  : "更新中..."
+                : type === "create"
+                  ? "返信する"
+                  : "更新する"}
             </Button>
           </div>
         </form>
