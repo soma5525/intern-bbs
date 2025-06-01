@@ -45,13 +45,13 @@ export default async function Signup(props: {
             <Input name="name" placeholder="ユーザー名" required />
 
             <Label htmlFor="email">メールアドレス</Label>
-            <Input name="email" placeholder="you@example.com" required />
+            <Input name="email" placeholder="メールアドレス" required />
 
             <Label htmlFor="password">パスワード</Label>
             <Input
               type="password"
               name="password"
-              placeholder="Your password"
+              placeholder="パスワード"
               minLength={6}
               required
             />
