@@ -56,13 +56,10 @@ export function ConfirmationPage({
       if (err && typeof err === "object" && "digest" in err) {
         const digestStr = String(err.digest || "");
         if (digestStr.includes("NEXT_REDIRECT")) {
-          console.log(
-            "リダイレクトが発生します。このエラーは無視してください。"
-          );
           return;
         }
       }
-      console.error("handleConfirm catch error:", JSON.stringify(err, null, 2));
+
       setError("予期しないエラーが発生しました");
     } finally {
       setProcessing(false);

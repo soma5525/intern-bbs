@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import {
   Card,
   CardContent,
@@ -34,6 +35,17 @@ interface PostCardProps {
   };
   isOwner: boolean;
   showActions?: boolean;
+}
+
+// 削除ボタンコンポーネント（useFormStatusを使用）
+function DeleteButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button variant="destructive" size="sm" type="submit" disabled={pending}>
+      {pending ? "削除中..." : "削除"}
+    </Button>
+  );
 }
 
 export function PostCard({ post, isOwner, showActions = true }: PostCardProps) {
@@ -105,9 +117,7 @@ export function PostCard({ post, isOwner, showActions = true }: PostCardProps) {
             </Button>
             <form action={`/protected/posts/${post.id}/delete`} method="post">
               <input type="hidden" name="id" value={post.id} />
-              <Button variant="destructive" size="sm" type="submit">
-                削除
-              </Button>
+              <DeleteButton />
             </form>
           </div>
         )}

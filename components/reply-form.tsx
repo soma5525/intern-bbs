@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -27,6 +29,51 @@ interface ReplyFormProps {
   };
 }
 
+// フォーム送信ボタンコンポーネント（useFormStatusを使用）
+function SubmitButton({
+  type,
+  content,
+}: {
+  type: "create" | "edit";
+  content: string;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending || !content.trim()}>
+      {pending
+        ? type === "create"
+          ? "投稿中..."
+          : "更新中..."
+        : type === "create"
+          ? "返信する"
+          : "更新する"}
+    </Button>
+  );
+}
+
+// クリアボタンコンポーネント（useFormStatusを使用）
+function ClearButton({
+  onClear,
+  disabled,
+}: {
+  onClear: () => void;
+  disabled?: boolean;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onClear}
+      disabled={pending || disabled}
+    >
+      クリア
+    </Button>
+  );
+}
+
 export function ReplyForm({
   parentId,
   action,
@@ -34,11 +81,10 @@ export function ReplyForm({
   initialData,
 }: ReplyFormProps) {
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState(initialData?.content || "");
+  const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -47,19 +93,21 @@ export function ReplyForm({
         setError(result.error);
       } else if (type === "create") {
         setContent("");
-        // 成功時にページをリロードして最新の返信を表示
-        window.location.reload();
+        // Next.jsルーターを使用してページを更新（SPAナビゲーション）
+        router.refresh();
       } else if (type === "edit" && result && "success" in result) {
-        // 編集の場合は親投稿のページにリダイレクト
-        window.location.href = `/protected/posts/${parentId}`;
+        // Next.jsルーターを使用して親投稿ページにリダイレクト
+        router.push(`/protected/posts/${parentId}`);
       }
     } catch (err) {
       setError("予期せぬエラーが発生しました");
-    } finally {
-      // 必ずisLoadingをfalseにリセット
-      setIsLoading(false);
     }
   }
+
+  const handleClear = () => {
+    setContent(initialData?.content || "");
+    setError(null);
+  };
 
   return (
     <Card className="w-full">
@@ -99,26 +147,8 @@ export function ReplyForm({
                 <Link href={`/protected/posts/${parentId}`}>キャンセル</Link>
               </Button>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setContent(initialData?.content || "");
-                setError(null);
-              }}
-              disabled={isLoading}
-            >
-              クリア
-            </Button>
-            <Button type="submit" disabled={isLoading || !content.trim()}>
-              {isLoading
-                ? type === "create"
-                  ? "投稿中..."
-                  : "更新中..."
-                : type === "create"
-                  ? "返信する"
-                  : "更新する"}
-            </Button>
+            <ClearButton onClear={handleClear} />
+            <SubmitButton type={type} content={content} />
           </div>
         </form>
       </CardContent>

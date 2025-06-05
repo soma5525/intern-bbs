@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import {
   Card,
   CardHeader,
@@ -28,13 +29,22 @@ interface PostFormProps {
   };
 }
 
+// フォーム送信ボタンコンポーネント（useFormStatusを使用）
+function SubmitButton({ type }: { type: "create" | "edit" }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? "投稿中..." : type === "create" ? "投稿" : "更新"}
+    </Button>
+  );
+}
+
 export function PostForm({ type, action, initialData }: PostFormProps) {
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
-    setIsLoading(true);
     setError(null);
 
     try {
@@ -49,8 +59,6 @@ export function PostForm({ type, action, initialData }: PostFormProps) {
       }
     } catch (err) {
       setError("予期しないエラーが発生しました");
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -97,9 +105,7 @@ export function PostForm({ type, action, initialData }: PostFormProps) {
             <Button variant="outline" asChild>
               <Link href="/protected/posts">キャンセル</Link>
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "投稿中..." : "投稿"}
-            </Button>
+            <SubmitButton type={type} />
           </div>
         </form>
       </CardContent>
