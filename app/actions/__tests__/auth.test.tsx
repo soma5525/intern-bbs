@@ -93,17 +93,21 @@ describe("📝 Auth Actions 統合テスト", () => {
       expect(mockRedirect).toHaveBeenCalledWith("/sign-up/confirm");
     });
 
-    it("データが不足している場合はエラーを返す", async () => {
+    it("データが不足している場合はエラーリダイレクトを返す", async () => {
       const formData = new FormData();
       formData.append("email", "test@example.com");
       formData.append("password", "password123");
 
-      await expect(saveSignUp(formData)).rejects.toThrow(
+      await saveSignUp(formData);
+
+      expect(mockEncodedRedirect).toHaveBeenCalledWith(
+        "error",
+        "/sign-up",
         "メールアドレス、パスワード、名前は必須項目です"
       );
     });
 
-    it("メールアドレスがすでに存在する場合はエラーを返す", async () => {
+    it("メールアドレスがすでに存在する場合はエラーリダイレクトを返す", async () => {
       (mockPrisma.userProfile.findUnique as jest.Mock).mockResolvedValue({
         id: "user1",
         email: "test@example.com",
@@ -116,19 +120,27 @@ describe("📝 Auth Actions 統合テスト", () => {
       formData.append("password", "password123");
       formData.append("name", "Test User");
 
-      await expect(saveSignUp(formData)).rejects.toThrow(
+      await saveSignUp(formData);
+
+      expect(mockEncodedRedirect).toHaveBeenCalledWith(
+        "error",
+        "/sign-up",
         "メールアドレスはすでに使用されています"
       );
     });
 
-    it("パスワードが6文字未満の場合はエラーを返す", async () => {
+    it("パスワードが6文字未満の場合はエラーリダイレクトを返す", async () => {
       (mockPrisma.userProfile.findUnique as jest.Mock).mockResolvedValue(null);
       const formData = new FormData();
       formData.append("email", "test@example.com");
       formData.append("password", "12345");
       formData.append("name", "Test User");
 
-      await expect(saveSignUp(formData)).rejects.toThrow(
+      await saveSignUp(formData);
+
+      expect(mockEncodedRedirect).toHaveBeenCalledWith(
+        "error",
+        "/sign-up",
         "パスワードは6文字以上である必要があります"
       );
     });
@@ -313,10 +325,20 @@ describe("📝 Auth Actions 統合テスト", () => {
         auth: {
           signInWithPassword: jest.fn().mockResolvedValue({
             error: null,
+            data: { user: { id: "supabase-user-id" } },
           }),
         },
       };
       mockCreateClient.mockResolvedValue(mockSupabase);
+
+      // アクティブユーザーのモック
+      (mockPrisma.userProfile.findUnique as jest.Mock).mockResolvedValue({
+        id: "user1",
+        supabaseUid: "supabase-user-id",
+        name: "Test User",
+        email: "test@example.com",
+        isActive: true, // アクティブ
+      });
 
       const formData = new FormData();
       formData.append("email", "test@example.com");
@@ -336,6 +358,7 @@ describe("📝 Auth Actions 統合テスト", () => {
         auth: {
           signInWithPassword: jest.fn().mockResolvedValue({
             error: { message: "Invalid credentials" },
+            data: { user: null },
           }),
         },
       };
@@ -351,6 +374,70 @@ describe("📝 Auth Actions 統合テスト", () => {
         "error",
         "/sign-in",
         "Invalid credentials"
+      );
+    });
+
+    it("非アクティブユーザーのログインは拒否される", async () => {
+      const mockSupabase = {
+        auth: {
+          signInWithPassword: jest.fn().mockResolvedValue({
+            error: null,
+            data: { user: { id: "supabase-user-id" } },
+          }),
+          signOut: jest.fn().mockResolvedValue({}),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase);
+
+      // 非アクティブユーザーのモック
+      (mockPrisma.userProfile.findUnique as jest.Mock).mockResolvedValue({
+        id: "user1",
+        supabaseUid: "supabase-user-id",
+        name: "Test User",
+        email: "test@example.com",
+        isActive: false, // 非アクティブ
+      });
+
+      const formData = new FormData();
+      formData.append("email", "test@example.com");
+      formData.append("password", "password123");
+
+      await signInAction(formData);
+
+      expect(mockSupabase.auth.signOut).toHaveBeenCalled();
+      expect(mockEncodedRedirect).toHaveBeenCalledWith(
+        "error",
+        "/sign-in",
+        "このアカウントは無効化されています"
+      );
+    });
+
+    it("ユーザープロフィールが存在しない場合もログインは拒否される", async () => {
+      const mockSupabase = {
+        auth: {
+          signInWithPassword: jest.fn().mockResolvedValue({
+            error: null,
+            data: { user: { id: "supabase-user-id" } },
+          }),
+          signOut: jest.fn().mockResolvedValue({}),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase);
+
+      // ユーザープロフィールが存在しない
+      (mockPrisma.userProfile.findUnique as jest.Mock).mockResolvedValue(null);
+
+      const formData = new FormData();
+      formData.append("email", "test@example.com");
+      formData.append("password", "password123");
+
+      await signInAction(formData);
+
+      expect(mockSupabase.auth.signOut).toHaveBeenCalled();
+      expect(mockEncodedRedirect).toHaveBeenCalledWith(
+        "error",
+        "/sign-in",
+        "このアカウントは無効化されています"
       );
     });
   });

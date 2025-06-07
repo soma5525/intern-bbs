@@ -9,6 +9,9 @@ export async function createReply(parentId: string, formData: FormData) {
   if (!user) {
     return { error: "ユーザーが見つかりません" };
   }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
 
   const content = formData.get("content") as string;
 
@@ -46,6 +49,10 @@ export async function getPostWithReplies(id: string) {
     return { error: "ユーザーが見つかりません" };
   }
 
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
+
   const post = await prisma.post.findUnique({
     where: { id, isDeleted: false },
     include: {
@@ -81,6 +88,9 @@ export async function updateReply(formData: FormData) {
   const user = await getCurrentUser();
   if (!user) {
     return { error: "ユーザーが見つかりません" };
+  }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
   }
 
   const id = formData.get("id") as string;

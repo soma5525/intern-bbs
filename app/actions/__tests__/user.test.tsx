@@ -314,6 +314,13 @@ describe("📝 User Actions 統合テスト", () => {
         isActive: true,
       });
 
+      const mockSupabase = {
+        auth: {
+          signOut: jest.fn().mockResolvedValue({}),
+        },
+      };
+      mockCreateClient.mockResolvedValue(mockSupabase as any);
+
       (mockPrisma.userProfile.update as jest.Mock).mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -329,6 +336,7 @@ describe("📝 User Actions 統合テスト", () => {
           isActive: false,
         },
       });
+      expect(mockSupabase.auth.signOut).toHaveBeenCalled();
       expect(mockRevalidatePath).toHaveBeenCalledWith(
         "/protected/profile/edit"
       );

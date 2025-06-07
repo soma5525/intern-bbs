@@ -82,12 +82,21 @@ export async function deactivateAccount() {
     return { error: "ユーザーが見つかりません" };
   }
 
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
+
+  // Prismaでユーザーを非アクティブ化
   await prisma.userProfile.update({
     where: { id: user.id },
     data: {
       isActive: false,
     },
   });
+
+  // Supabase Authからサインアウト
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 
   revalidatePath("/protected/profile/edit");
   redirect("/sign-in");

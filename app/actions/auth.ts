@@ -7,13 +7,17 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-export const saveSignUp = async (formData: FormData): Promise<void> => {
+export const saveSignUp = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const name = formData.get("name")?.toString();
 
   if (!email || !password || !name) {
-    throw new Error("メールアドレス、パスワード、名前は必須項目です");
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "メールアドレス、パスワード、名前は必須項目です"
+    );
   }
 
   const existingUser = await prisma.userProfile.findUnique({
@@ -22,11 +26,19 @@ export const saveSignUp = async (formData: FormData): Promise<void> => {
     },
   });
   if (existingUser) {
-    throw new Error("メールアドレスはすでに使用されています");
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "メールアドレスはすでに使用されています"
+    );
   }
 
   if (password.length < 6) {
-    throw new Error("パスワードは6文字以上である必要があります");
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "パスワードは6文字以上である必要があります"
+    );
   }
 
   const cookieStore = await cookies();
@@ -114,13 +126,32 @@ export const signInAction = async (formData: FormData) => {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error, data } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
   if (error) {
     return encodedRedirect("error", "/sign-in", error.message);
+  }
+
+  // ログイン成功後、Prismaでユーザーのアクティブ状態をチェック
+  if (data.user) {
+    const userProfile = await prisma.userProfile.findUnique({
+      where: {
+        supabaseUid: data.user.id,
+      },
+    });
+
+    if (!userProfile || !userProfile.isActive) {
+      // 非アクティブユーザーの場合はサインアウトして拒否
+      await supabase.auth.signOut();
+      return encodedRedirect(
+        "error",
+        "/sign-in",
+        "このアカウントは無効化されています"
+      );
+    }
   }
 
   return redirect("/protected/posts");

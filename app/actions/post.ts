@@ -9,6 +9,13 @@ export async function createPost(formData: FormData) {
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
 
+  if (!user) {
+    return { error: "ユーザーが見つかりません" };
+  }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
+
   if (!title || title.length > 150) {
     return { error: "タイトルは必須で、150文字以内である必要があります" };
   }
@@ -38,6 +45,13 @@ export async function updatePost(formData: FormData) {
   const id = formData.get("id") as string;
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
+
+  if (!user) {
+    return { error: "ユーザーが見つかりません" };
+  }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
 
   if (!title || title.length > 150) {
     return { error: "タイトルは必須で、150文字以内である必要があります" };
@@ -100,6 +114,9 @@ export async function getPosts(page = 1) {
           replies: {
             where: {
               isDeleted: false,
+              author: {
+                isActive: true,
+              },
             },
           },
         },
@@ -139,11 +156,20 @@ export async function getPosts(page = 1) {
 
 export async function getPost(id: string) {
   const user = await getCurrentUser();
+  if (!user) {
+    return { error: "ユーザーが見つかりません" };
+  }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
 
   const post = await prisma.post.findUnique({
     where: {
       id,
       isDeleted: false,
+      author: {
+        isActive: true,
+      },
     },
     include: {
       author: {
@@ -169,6 +195,12 @@ export async function getPost(id: string) {
 
 export async function deletePost(id: string) {
   const user = await getCurrentUser();
+  if (!user) {
+    return { error: "ユーザーが見つかりません" };
+  }
+  if (user.isActive === false) {
+    return { error: "アカウントが無効です" };
+  }
 
   const post = await prisma.post.findUnique({
     where: {
