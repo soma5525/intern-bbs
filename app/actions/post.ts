@@ -10,7 +10,7 @@ export async function createPost(formData: FormData) {
   const content = formData.get("content") as string;
 
   if (!title || title.length > 150) {
-    return { error: "タイトルは必須で、150文字以内である必要があります。" };
+    return { error: "タイトルは必須で、150文字以内である必要があります" };
   }
 
   if (!content) {
@@ -29,7 +29,6 @@ export async function createPost(formData: FormData) {
     // redirect("/protected/posts"); // リダイレクトはクライアントサイドで行う必要がある
     return { success: true };
   } catch (error) {
-    console.error(error);
     return { error: "投稿に失敗しました" };
   }
 }
@@ -41,12 +40,12 @@ export async function updatePost(formData: FormData) {
   const content = formData.get("content") as string;
 
   if (!title || title.length > 150) {
-    return { error: "タイトルは必須で、150文字以内である必要があります。" };
+    return { error: "タイトルは必須で、150文字以内である必要があります" };
   }
 
   if (!content) {
     return {
-      error: "内容は必須です。",
+      error: "内容は必須です",
     };
   }
 
@@ -58,11 +57,11 @@ export async function updatePost(formData: FormData) {
   });
 
   if (!post) {
-    return { error: "投稿が見つかりません。" };
+    return { error: "投稿が見つかりません" };
   }
 
   if (post.authorId !== user?.id) {
-    return { error: "この投稿を編集する権限がありません。" };
+    return { error: "この投稿を編集する権限がありません" };
   }
 
   await prisma.post.update({
@@ -179,11 +178,11 @@ export async function deletePost(id: string) {
   });
 
   if (!post) {
-    return { error: "投稿が見つかりません。" };
+    return { error: "投稿が見つかりません" };
   }
 
   if (post.authorId !== user?.id) {
-    return { error: "この投稿を削除する権限がありません。" };
+    return { error: "この投稿を削除する権限がありません" };
   }
 
   try {
@@ -196,11 +195,11 @@ export async function deletePost(id: string) {
 
     revalidatePath("/protected/posts");
     // redirect は成功した場合のみ行われるべきなので、ここでは return するか、
-    // ルートハンドラ側でリダイレクトをハンドリングする。
-    // 今回は成功を示すために { success: true } を返すように変更し、リダイレクトはルートハンドラで行う。
+    // ルートハンドラ側でリダイレクトをハンドリングする
+    // 今回は成功を示すために { success: true } を返すように変更し、リダイレクトはルートハンドラで行う
     return { success: true };
   } catch (dbError) {
     console.error("データベース削除エラー:", dbError); // 詳細なエラーログ
-    return { error: "投稿の削除中にデータベースエラーが発生しました。" };
+    return { error: "投稿の削除中にデータベースエラーが発生しました" };
   }
 }

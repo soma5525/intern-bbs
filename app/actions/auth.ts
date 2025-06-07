@@ -16,6 +16,19 @@ export const saveSignUp = async (formData: FormData): Promise<void> => {
     throw new Error("メールアドレス、パスワード、名前は必須項目です");
   }
 
+  const existingUser = await prisma.userProfile.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (existingUser) {
+    throw new Error("メールアドレスはすでに使用されています");
+  }
+
+  if (password.length < 6) {
+    throw new Error("パスワードは6文字以上である必要があります");
+  }
+
   const cookieStore = await cookies();
   cookieStore.set("signUpData", JSON.stringify({ email, password, name }), {
     maxAge: 60 * 10,
@@ -81,7 +94,6 @@ export const signUpAction = async (formData: FormData) => {
         },
       });
     } catch (error) {
-      console.error("プロフィール作成時のエラー", error);
       return encodedRedirect(
         "error",
         "/sign-up",
@@ -129,7 +141,6 @@ export const forgotPasswordAction = async (formData: FormData) => {
   });
 
   if (error) {
-    console.error(error.message);
     return encodedRedirect(
       "error",
       "/forgot-password",
