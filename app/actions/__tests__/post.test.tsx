@@ -272,7 +272,13 @@ describe("📝 Post Actions 統合テスト", () => {
         },
         include: {
           author: { select: { name: true } },
-          _count: { select: { replies: { where: { isDeleted: false } } } },
+          _count: {
+            select: {
+              replies: {
+                where: { isDeleted: false, author: { isActive: true } },
+              },
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
         skip: 0,
