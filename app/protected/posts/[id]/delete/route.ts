@@ -30,7 +30,6 @@ export async function POST(
       }
     );
   } catch (error) {
-    console.error("ルートハンドラでの削除エラー:", error);
     return new Response(
       JSON.stringify({
         error: "投稿の削除処理中にサーバーエラーが発生しました。",

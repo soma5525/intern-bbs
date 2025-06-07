@@ -33,7 +33,6 @@ export async function createPost(formData: FormData) {
       },
     });
     revalidatePath("/protected/posts");
-    // redirect("/protected/posts"); // リダイレクトはクライアントサイドで行う必要がある
     return { success: true };
   } catch (error) {
     return { error: "投稿に失敗しました" };
@@ -87,7 +86,6 @@ export async function updatePost(formData: FormData) {
   });
 
   revalidatePath("/protected/posts");
-  // redirect("/protected/posts"); // ここも上記のcreatePostと同様
   return { success: true };
 }
 
@@ -139,8 +137,6 @@ export async function getPosts(page = 1) {
     },
   });
 
-  // paginationのためのデータを作成
-  // 現在のページ、総ページ数、次のページがあるかどうか、前のページがあるかどうか
   const totalPages = Math.ceil(totalPosts / postsPerPage);
 
   return {
@@ -226,12 +222,8 @@ export async function deletePost(id: string) {
     });
 
     revalidatePath("/protected/posts");
-    // redirect は成功した場合のみ行われるべきなので、ここでは return するか、
-    // ルートハンドラ側でリダイレクトをハンドリングする
-    // 今回は成功を示すために { success: true } を返すように変更し、リダイレクトはルートハンドラで行う
     return { success: true };
   } catch (dbError) {
-    console.error("データベース削除エラー:", dbError); // 詳細なエラーログ
     return { error: "投稿の削除中にデータベースエラーが発生しました" };
   }
 }

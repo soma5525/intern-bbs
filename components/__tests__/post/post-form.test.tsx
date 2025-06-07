@@ -155,7 +155,6 @@ describe("PostForm", () => {
 
     it("編集フォームが正しく表示される", () => {
       const mockAction = jest.fn();
-      // TODO: PostFormコンポーネントをレンダリング（type="edit", initialDataあり）
       render(
         <PostForm type="edit" action={mockAction} initialData={initialData} />
       );
@@ -174,7 +173,6 @@ describe("PostForm", () => {
       render(
         <PostForm type="edit" action={mockAction} initialData={initialData} />
       );
-      // TODO: PostFormコンポーネントをレンダリング（編集モード）
 
       const hiddenInput = document.querySelector(
         'input[name="id"]'
@@ -254,9 +252,7 @@ describe("PostForm", () => {
       fireEvent.change(titleInput, { target: { value: "テストタイトル" } });
       fireEvent.change(contentTextarea, { target: { value: "テスト内容" } });
       fireEvent.click(submitButton);
-      // TODO: waitForを使って以下を確認
-      // - mockActionがFormDataで呼ばれることを確認
-      // - FormDataから値を取得して確認
+
       await waitFor(() => {
         expect(mockAction).toHaveBeenCalledWith(expect.any(FormData));
         const formData = mockAction.mock.calls[0][0] as FormData; // [0]はmockActionの呼び出し回数、[0]はFormData
@@ -266,7 +262,6 @@ describe("PostForm", () => {
     });
 
     it("編集時にIDが含まれる", async () => {
-      // TODO: mockActionが{ success: true }を返すように設定
       const mockAction = jest.fn().mockResolvedValue({ success: true });
 
       const initialData = {

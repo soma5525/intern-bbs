@@ -66,14 +66,10 @@ export function ProfileForm({
         if (digestStr.includes("NEXT_REDIRECT")) {
           // リダイレクトエラーは正常なフローなので、エラーとして扱わない
           // リダイレクトはサーバーサイドで処理されるため、ここで何もする必要なし
-          console.log(
-            "リダイレクトが発生します。このエラーは無視してください。"
-          );
           return;
         }
       }
       // それ以外の予期しないエラー
-      console.error("handleSubmit catch error:", JSON.stringify(err, null, 2));
       setError("予期しないエラーが発生しました");
     } finally {
       setIsLoading(false);

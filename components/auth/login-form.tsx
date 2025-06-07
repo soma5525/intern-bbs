@@ -55,7 +55,7 @@ export function LoginForm({
     try {
       await onSubmit(formData);
     } catch (error) {
-      console.error("Login error:", error);
+      // エラーハンドリングは親コンポーネントで行う
     }
   };
 

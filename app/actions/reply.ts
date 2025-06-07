@@ -40,7 +40,6 @@ export async function createReply(parentId: string, formData: FormData) {
   });
 
   revalidatePath(`/protected/posts/${parentId}`);
-  // redirect(`/protected/posts/${parentId}`);
 }
 
 export async function getPostWithReplies(id: string) {
