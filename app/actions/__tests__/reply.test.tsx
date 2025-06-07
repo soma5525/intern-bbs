@@ -256,7 +256,11 @@ describe("📝 Reply Actions 統合テスト", () => {
       });
 
       expect(mockPrisma.post.findMany).toHaveBeenCalledWith({
-        where: { parentId: "post-1", isDeleted: false },
+        where: {
+          parentId: "post-1",
+          isDeleted: false,
+          author: { isActive: true },
+        },
         include: {
           author: {
             select: {
@@ -274,6 +278,66 @@ describe("📝 Reply Actions 統合テスト", () => {
         post: mockPost,
         replies: mockReplies,
       });
+    });
+
+    it("🚫 退会済みユーザーの返信は表示されない", async () => {
+      mockGetCurrentUser.mockResolvedValue({
+        id: "user1",
+        name: "test user",
+        email: "test@example.com",
+        isActive: true,
+      });
+
+      const mockPost = {
+        id: "post-1",
+        title: "投稿タイトル",
+        content: "投稿内容",
+        authorId: "user2",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDeleted: false,
+        author: {
+          id: "user2",
+          name: "投稿者",
+        },
+      };
+
+      // アクティブなユーザーの返信のみを含む配列を返す
+      const mockReplies = [
+        {
+          id: "reply-1",
+          title: "",
+          content: "アクティブなユーザーの返信",
+          authorId: "user1",
+          parentId: "post-1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isDeleted: false,
+          author: {
+            id: "user1",
+            name: "アクティブなユーザー",
+          },
+        },
+      ];
+
+      (mockPrisma.post.findUnique as jest.Mock).mockResolvedValue(mockPost);
+      (mockPrisma.post.findMany as jest.Mock).mockResolvedValue(mockReplies);
+
+      const result = await getPostWithReplies("post-1");
+
+      // findManyクエリのwhere句に退会済みユーザーの返信を除外する条件があることを確認
+      expect(mockPrisma.post.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            author: { isActive: true },
+          }),
+        })
+      );
+
+      // 返信一覧に退会済みユーザーの返信が含まれていないことを確認
+      expect(result).toHaveProperty("replies");
+      expect(result.replies).toHaveLength(1);
+      expect(result.replies?.[0]?.authorId).toBe("user1");
     });
 
     it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
@@ -518,6 +582,7 @@ describe("📝 Reply Actions 統合テスト", () => {
 
 ✅ getPostWithReplies のテストケース:
 - 正常な投稿と返信の取得
+- 退会済みユーザーの返信は表示されないことを確認
 - ユーザー認証エラー
 - 投稿が存在しない
 

@@ -292,6 +292,35 @@ describe("📝 Post Actions 統合テスト", () => {
         hasPrevPage: false,
       });
     });
+
+    it("🚫 レベル6: 退会済みユーザーの投稿は表示されない", async () => {
+      // 退会済みユーザーの投稿は取得されないことを確認
+      (mockPrisma.post.findMany as jest.Mock).mockResolvedValue([]);
+      (mockPrisma.post.count as jest.Mock).mockResolvedValue(0);
+
+      const result = await getPosts(1);
+
+      // findManyクエリのwhere句に退会済みユーザーの投稿を除外する条件があることを確認
+      expect(mockPrisma.post.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          // ここでは、expect.objectContainingを使用して、where句の条件を確認しています。
+          // objectContainingは、オブジェクトの中身を確認するためのマッチャーです。
+          // この場合、author: { isActive: true } の条件があることを確認しています。
+          where: expect.objectContaining({
+            author: { isActive: true },
+          }),
+        })
+      );
+
+      // 結果が空の配列であることを確認
+      expect(result.posts).toEqual([]);
+      expect(result.pagination).toEqual({
+        currentPage: 1,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
+    });
   });
 
   describe("🔍 getPost（投稿詳細取得）", () => {
@@ -432,6 +461,7 @@ describe("📝 Post Actions 統合テスト", () => {
 - 複雑なデータ構造のテスト
 - ページネーションのテスト
 - 統合的なテストの書き方
+- 退会済みユーザーの投稿が表示されないことのテスト
 
 🔧 よく使うJestのマッチャー:
 - expect(actual).toEqual(expected) - オブジェクトの深い比較

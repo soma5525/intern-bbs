@@ -67,7 +67,13 @@ export async function getPostWithReplies(id: string) {
   }
 
   const replies = await prisma.post.findMany({
-    where: { parentId: id, isDeleted: false },
+    where: {
+      parentId: id,
+      isDeleted: false,
+      author: {
+        isActive: true,
+      },
+    },
     include: {
       author: {
         select: {

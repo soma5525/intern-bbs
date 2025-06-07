@@ -94,6 +94,16 @@ export async function deactivateAccount() {
     },
   });
 
+  // 投稿を非アクティブ化
+  await prisma.post.updateMany({
+    where: {
+      authorId: user.id,
+    },
+    data: {
+      isDeleted: true, // 投稿を削除状態にする
+    },
+  });
+
   // Supabase Authからサインアウト
   const supabase = await createClient();
   await supabase.auth.signOut();

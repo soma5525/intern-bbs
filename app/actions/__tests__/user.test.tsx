@@ -36,6 +36,9 @@ jest.mock("@/lib/prisma", () => ({
     userProfile: {
       update: jest.fn(),
     },
+    post: {
+      updateMany: jest.fn(),
+    },
   },
 }));
 
@@ -306,7 +309,7 @@ describe("📝 User Actions 統合テスト", () => {
   });
 
   describe("🗑️ deactivateAccount（アカウント無効化）", () => {
-    it("✅ 正常にアカウントを無効化できる", async () => {
+    it("✅ 正常にアカウントを無効化し、ユーザーの投稿も論理削除する", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -328,15 +331,33 @@ describe("📝 User Actions 統合テスト", () => {
         isActive: false,
       });
 
+      // 投稿の一括更新のモック
+      const mockUpdateMany = jest.fn().mockResolvedValue({ count: 5 });
+      (mockPrisma.post as any).updateMany = mockUpdateMany;
+
       await deactivateAccount();
 
+      // ユーザープロファイルが非アクティブになることを検証
       expect(mockPrisma.userProfile.update).toHaveBeenCalledWith({
         where: { id: "user1" },
         data: {
           isActive: false,
         },
       });
+
+      // ユーザーの投稿が論理削除されることを検証
+      expect(mockUpdateMany).toHaveBeenCalledWith({
+        where: {
+          authorId: "user1",
+        },
+        data: {
+          isDeleted: true,
+        },
+      });
+
+      // Supabaseからサインアウトされることを検証
       expect(mockSupabase.auth.signOut).toHaveBeenCalled();
+
       expect(mockRevalidatePath).toHaveBeenCalledWith(
         "/protected/profile/edit"
       );
@@ -352,6 +373,7 @@ describe("📝 User Actions 統合テスト", () => {
         error: "ユーザーが見つかりません",
       });
       expect(mockPrisma.userProfile.update).not.toHaveBeenCalled();
+      expect(mockPrisma.post.updateMany).not.toHaveBeenCalled();
       expect(mockRedirect).not.toHaveBeenCalled();
     });
 
@@ -363,11 +385,43 @@ describe("📝 User Actions 統合テスト", () => {
         isActive: true,
       });
 
+      // ユーザープロファイルの更新でエラーが発生するケース
       (mockPrisma.userProfile.update as jest.Mock).mockRejectedValue(
         new Error("Database error")
       );
 
+      // 投稿更新はモックするが、実行されないはず
+      const mockUpdateMany = jest.fn();
+      (mockPrisma.post as any).updateMany = mockUpdateMany;
+
       await expect(deactivateAccount()).rejects.toThrow("Database error");
+
+      // エラーが発生したため、投稿の更新は実行されないことを確認
+      expect(mockUpdateMany).not.toHaveBeenCalled();
+    });
+
+    it("💥 投稿の更新でエラーが発生した場合もエラーを投げる", async () => {
+      mockGetCurrentUser.mockResolvedValue({
+        id: "user1",
+        name: "test user",
+        email: "test@example.com",
+        isActive: true,
+      });
+
+      // ユーザープロファイルの更新は成功
+      (mockPrisma.userProfile.update as jest.Mock).mockResolvedValue({
+        id: "user1",
+        name: "test user",
+        email: "test@example.com",
+        isActive: false,
+      });
+
+      // 投稿の更新でエラーが発生するケース
+      (mockPrisma.post.updateMany as jest.Mock).mockRejectedValue(
+        new Error("Post update error")
+      );
+
+      await expect(deactivateAccount()).rejects.toThrow("Post update error");
     });
   });
 
@@ -501,9 +555,10 @@ describe("📝 User Actions 統合テスト", () => {
 - データベース更新エラー（ロールバック機能付き）
 
 ✅ deactivateAccount のテストケース:
-- 正常なアカウント無効化
+- 正常なアカウント無効化（ユーザープロファイルの無効化と投稿の論理削除）
 - ユーザー認証エラー
-- データベースエラー
+- データベースエラー（ユーザープロファイル更新エラー）
+- データベースエラー（投稿更新エラー）
 
 ✅ getProfileData のテストケース:
 - 正常なプロフィールデータ取得
