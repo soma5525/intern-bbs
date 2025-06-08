@@ -47,7 +47,7 @@ describe("📝 Reply Actions 統合テスト", () => {
   });
 
   describe("🔹 createReply（返信作成）", () => {
-    it("✅ 正常に返信を作成できる", async () => {
+    it("正常に返信を作成できる", async () => {
       // モックユーザーを設定
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
@@ -104,7 +104,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       );
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const formData = new FormData();
@@ -118,7 +118,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalled();
     });
 
-    it("❌ 返信内容が空の場合はエラーを返す", async () => {
+    it("返信内容が空の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -137,7 +137,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalled();
     });
 
-    it("❌ 返信先の投稿が見つからない場合はエラーを返す", async () => {
+    it("返信先の投稿が見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -158,7 +158,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalled();
     });
 
-    it("💥 データベースエラーが発生した場合はエラーを投げる", async () => {
+    it("データベースエラーが発生した場合はエラーを投げる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -188,7 +188,7 @@ describe("📝 Reply Actions 統合テスト", () => {
   });
 
   describe("📋 getPostWithReplies（投稿と返信取得）", () => {
-    it("✅ 正常に投稿と返信を取得できる", async () => {
+    it(" 正常に投稿と返信を取得できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -280,7 +280,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       });
     });
 
-    it("🚫 退会済みユーザーの返信は表示されない", async () => {
+    it("退会済みユーザーの返信は表示されない", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -340,7 +340,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(result.replies?.[0]?.authorId).toBe("user1");
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const result = await getPostWithReplies("post-1");
@@ -351,7 +351,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.findUnique).not.toHaveBeenCalled();
     });
 
-    it("❌ 投稿が見つからない場合はエラーを返す", async () => {
+    it("投稿が見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -371,7 +371,7 @@ describe("📝 Reply Actions 統合テスト", () => {
   });
 
   describe("🔸 updateReply（返信更新）", () => {
-    it("✅ 正常に返信を更新できる", async () => {
+    it(" 正常に返信を更新できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -414,7 +414,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(result).toEqual({ success: true });
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const formData = new FormData();
@@ -429,7 +429,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("❌ 返信内容が空の場合はエラーを返す", async () => {
+    it("返信内容が空の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -449,7 +449,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("❌ 返信が見つからない場合はエラーを返す", async () => {
+    it("返信が見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -471,7 +471,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("🚫 他人の返信を編集しようとした場合はエラーを返す", async () => {
+    it("他人の返信を編集しようとした場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -504,7 +504,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("🚫 返信ではない投稿を編集しようとした場合はエラーを返す", async () => {
+    it("返信ではない投稿を編集しようとした場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -537,7 +537,7 @@ describe("📝 Reply Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("💥 データベースエラーが発生した場合はエラーを投げる", async () => {
+    it("データベースエラーが発生した場合はエラーを投げる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -573,20 +573,20 @@ describe("📝 Reply Actions 統合テスト", () => {
 /*
 🎓 Reply Actions テスト まとめ
 
-✅ createReply のテストケース:
+ createReply のテストケース:
 - 正常な返信作成
 - ユーザー認証エラー
 - バリデーションエラー（空の内容）
 - 親投稿が存在しない
 - データベースエラー
 
-✅ getPostWithReplies のテストケース:
+ getPostWithReplies のテストケース:
 - 正常な投稿と返信の取得
 - 退会済みユーザーの返信は表示されないことを確認
 - ユーザー認証エラー
 - 投稿が存在しない
 
-✅ updateReply のテストケース:
+ updateReply のテストケース:
 - 正常な返信更新
 - ユーザー認証エラー
 - バリデーションエラー（空の内容）

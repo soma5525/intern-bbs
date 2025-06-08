@@ -55,7 +55,7 @@ describe("📝 Post Actions 統合テスト", () => {
   });
 
   describe("🔹 createPost（投稿作成）", () => {
-    it("✅ レベル2: 正常に投稿を作成できる", async () => {
+    it("正常に投稿を作成できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -86,7 +86,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(result).toEqual({ success: true });
     });
 
-    it("❌ レベル3: タイトルが空の場合はエラーを返す", async () => {
+    it("タイトルが空の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -103,7 +103,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalledWith();
     });
 
-    it("❌ レベル3: タイトルが150文字を超える場合はエラーを返す", async () => {
+    it("タイトルが150文字を超える場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -120,7 +120,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalled();
     });
 
-    it("❌ レベル3: 内容が空の場合はエラーを返す", async () => {
+    it("内容が空の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -137,7 +137,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockPrisma.post.create).not.toHaveBeenCalled();
     });
 
-    it("💥 レベル5: データベースエラーが発生した場合はエラーを返す", async () => {
+    it("データベースエラーが発生した場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -161,7 +161,7 @@ describe("📝 Post Actions 統合テスト", () => {
   });
 
   describe("🔸 updatePost（投稿更新）", () => {
-    it("✅ レベル4: 正常に投稿を更新できる", async () => {
+    it("正常に投稿を更新できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -199,7 +199,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(result).toEqual({ success: true });
     });
 
-    it("❌ レベル4: 存在しない投稿の更新はエラーを返す", async () => {
+    it("存在しない投稿の更新はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -218,7 +218,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("🚫 レベル4: 他人の投稿の更新はエラーを返す", async () => {
+    it("他人の投稿の更新はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -245,7 +245,7 @@ describe("📝 Post Actions 統合テスト", () => {
   });
 
   describe("📋 getPosts（投稿一覧取得）", () => {
-    it("✅ レベル6: 投稿一覧を正常に取得できる", async () => {
+    it("投稿一覧を正常に取得できる", async () => {
       const mockPosts = [
         {
           id: "post1",
@@ -293,7 +293,7 @@ describe("📝 Post Actions 統合テスト", () => {
       });
     });
 
-    it("🚫 レベル6: 退会済みユーザーの投稿は表示されない", async () => {
+    it("退会済みユーザーの投稿は表示されない", async () => {
       // 退会済みユーザーの投稿は取得されないことを確認
       (mockPrisma.post.findMany as jest.Mock).mockResolvedValue([]);
       (mockPrisma.post.count as jest.Mock).mockResolvedValue(0);
@@ -324,7 +324,7 @@ describe("📝 Post Actions 統合テスト", () => {
   });
 
   describe("🔍 getPost（投稿詳細取得）", () => {
-    it("✅ レベル6: 投稿を正常に取得できる", async () => {
+    it("投稿を正常に取得できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -346,7 +346,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(result.isOwner).toBe(false);
     });
 
-    it("❌ レベル6: 存在しない投稿の取得はエラーを返す", async () => {
+    it("存在しない投稿の取得はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -360,7 +360,7 @@ describe("📝 Post Actions 統合テスト", () => {
   });
 
   describe("🗑️ deletePost（投稿削除）", () => {
-    it("✅ レベル6: 正常に投稿を削除できる", async () => {
+    it("正常に投稿を削除できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -395,7 +395,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockRevalidatePath).toHaveBeenCalledWith("/protected/posts");
     });
 
-    it("❌ レベル6: 存在しない投稿の削除はエラーを返す", async () => {
+    it("存在しない投稿の削除はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -408,7 +408,7 @@ describe("📝 Post Actions 統合テスト", () => {
       expect(mockPrisma.post.update).not.toHaveBeenCalled();
     });
 
-    it("🚫 レベル6: 他人の投稿の削除はエラーを返す", async () => {
+    it("他人の投稿の削除はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",

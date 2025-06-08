@@ -73,7 +73,7 @@ describe("📝 User Actions 統合テスト", () => {
   });
 
   describe("🔹 saveProfileData（プロフィールデータ保存）", () => {
-    it("✅ 正常にプロフィールデータを保存できる", async () => {
+    it("正常にプロフィールデータを保存できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -110,7 +110,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockRedirect).toHaveBeenCalledWith("/protected/profile/confirm");
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const formData = new FormData();
@@ -125,7 +125,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockRedirect).not.toHaveBeenCalled();
     });
 
-    it("❌ 名前が未入力の場合はエラーを返す", async () => {
+    it("名前が未入力の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -145,7 +145,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockRedirect).not.toHaveBeenCalled();
     });
 
-    it("❌ メールアドレスが未入力の場合はエラーを返す", async () => {
+    it("メールアドレスが未入力の場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -182,7 +182,7 @@ describe("📝 User Actions 統合テスト", () => {
       mockCookies.mockResolvedValue(mockCookieStore as any);
     });
 
-    it("✅ 正常にプロフィールを更新できる", async () => {
+    it("正常にプロフィールを更新できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -227,7 +227,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(result).toEqual({ success: true });
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const formData = new FormData();
@@ -239,7 +239,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockPrisma.userProfile.update).not.toHaveBeenCalled();
     });
 
-    it("❌ Supabase認証更新エラーが発生した場合はエラーを返す", async () => {
+    it("Supabase認証更新エラーが発生した場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -266,7 +266,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockPrisma.userProfile.update).not.toHaveBeenCalled();
     });
 
-    it("❌ データベース更新エラーが発生した場合はロールバックしてエラーを返す", async () => {
+    it("データベース更新エラーが発生した場合はロールバックしてエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -309,7 +309,7 @@ describe("📝 User Actions 統合テスト", () => {
   });
 
   describe("🗑️ deactivateAccount（アカウント無効化）", () => {
-    it("✅ 正常にアカウントを無効化し、ユーザーの投稿も論理削除する", async () => {
+    it("正常にアカウントを無効化し、ユーザーの投稿も論理削除する", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -364,7 +364,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockRedirect).toHaveBeenCalledWith("/sign-in");
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const result = await deactivateAccount();
@@ -377,7 +377,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockRedirect).not.toHaveBeenCalled();
     });
 
-    it("💥 データベースエラーが発生した場合はエラーを投げる", async () => {
+    it("データベースエラーが発生した場合はエラーを投げる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -400,7 +400,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(mockUpdateMany).not.toHaveBeenCalled();
     });
 
-    it("💥 投稿の更新でエラーが発生した場合もエラーを投げる", async () => {
+    it("投稿の更新でエラーが発生した場合もエラーを投げる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -426,7 +426,7 @@ describe("📝 User Actions 統合テスト", () => {
   });
 
   describe("📋 getProfileData（プロフィールデータ取得）", () => {
-    it("✅ 正常にプロフィールデータを取得できる", async () => {
+    it("正常にプロフィールデータを取得できる", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -453,7 +453,7 @@ describe("📝 User Actions 統合テスト", () => {
       expect(result).toEqual(profileData);
     });
 
-    it("❌ ユーザーが見つからない場合はエラーを返す", async () => {
+    it("ユーザーが見つからない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const result = await getProfileData();
@@ -463,7 +463,7 @@ describe("📝 User Actions 統合テスト", () => {
       });
     });
 
-    it("❌ Cookieが存在しない場合はエラーを返す", async () => {
+    it("Cookieが存在しない場合はエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -484,7 +484,7 @@ describe("📝 User Actions 統合テスト", () => {
       });
     });
 
-    it("❌ 異なるユーザーのCookieの場合はCookieを削除してエラーを返す", async () => {
+    it("異なるユーザーのCookieの場合はCookieを削除してエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
@@ -514,7 +514,7 @@ describe("📝 User Actions 統合テスト", () => {
       });
     });
 
-    it("❌ JSONパースに失敗した場合はCookieを削除してエラーを返す", async () => {
+    it("JSONパースに失敗した場合はCookieを削除してエラーを返す", async () => {
       mockGetCurrentUser.mockResolvedValue({
         id: "user1",
         name: "test user",
