@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+/test-results/
 
 # next.js
 /.next/
@@ -38,6 +39,14 @@ yarn-error.log*
 
 # SWC cache
 .swc/
+
+# Documentation
+/docs/
+todo.md
+
+# Editor directories and files
+.vscode
+.cursor/
 
 # vercel
 .vercel
