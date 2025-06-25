@@ -11,7 +11,7 @@
  */
 
 import { getCurrentUser } from "@/lib/auth";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

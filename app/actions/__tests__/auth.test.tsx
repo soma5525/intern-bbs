@@ -23,12 +23,12 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Supabaseクライアントのモック
-jest.mock("@/utils/supabase/server", () => ({
+jest.mock("@/lib/supabase/server", () => ({
   createClient: jest.fn(),
 }));
 
 // encodedRedirectのモック
-jest.mock("@/utils/utils", () => ({
+jest.mock("@/lib/utils", () => ({
   encodedRedirect: jest.fn(),
 }));
 
@@ -47,8 +47,8 @@ const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
 // 追加のモック
-const mockCreateClient = require("@/utils/supabase/server").createClient;
-const mockEncodedRedirect = require("@/utils/utils").encodedRedirect;
+const mockCreateClient = require("@/lib/supabase/server").createClient;
+const mockEncodedRedirect = require("@/lib/utils").encodedRedirect;
 
 describe("📝 Auth Actions 統合テスト", () => {
   beforeEach(() => {

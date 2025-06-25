@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
 import { ProfileForm } from "@/components/profile-form";
 import { saveProfileData, deactivateAccount } from "@/app/actions/user";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
